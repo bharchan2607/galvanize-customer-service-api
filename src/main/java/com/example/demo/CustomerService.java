@@ -8,48 +8,29 @@ import java.util.List;
 @Service
 public class CustomerService {
 
-    List<Customer> customers = new ArrayList<>();
+    CustomerRepository repository;
 
-    public void setCustomers(List<Customer> customers) {
-        this.customers = customers;
+    public CustomerService(CustomerRepository repository) {
+        this.repository = repository;
     }
 
     public List<Customer> getAllCustomers() {
-        return customers;
+        return repository.findAll();
     }
 
     public void addCustomer(Customer newCustomer) {
-        customers.add(newCustomer);
+        repository.save(newCustomer);
     }
 
     public Customer getCustomerById(String customerId) {
-        return customers.stream()
-                .filter(customer -> customer.getId().equals(customerId))
-                .findFirst()
-                .get();
+        return repository.findById(customerId).get();
     }
 
     public Customer updateCustomer(Customer updatedCustomer) {
-       boolean isCustomerRemoved =  false;
-        for(Customer customer : customers) {
-            if(customer.getId().equals(updatedCustomer.getId())) {
-                customers.remove(customer);
-                isCustomerRemoved = true;
-            }
-        }
-        if(isCustomerRemoved) {
-            customers.add(updatedCustomer);
-        }
-        return updatedCustomer;
+       return repository.save(updatedCustomer);
     }
 
-
     public void removeCustomer(String customerId) {
-        for(Customer customer: customers) {
-            if(customer.getId().equals(customerId)) {
-                customers.remove(customer);
-            }
-        }
-
+        repository.deleteById(customerId);
     }
 }

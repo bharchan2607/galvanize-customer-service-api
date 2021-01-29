@@ -2,13 +2,23 @@ package com.example.demo;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class CustomerServiceTest {
+    @Mock
+    CustomerRepository repository;
+
+    @InjectMocks
     CustomerService service;
 
     Customer customer1;
@@ -18,7 +28,6 @@ class CustomerServiceTest {
 
     @BeforeEach
     public void setUp() {
-        service = new CustomerService();
         customer1 = new Customer("Mark", "Davis", "someNumber", "someAddress");
         customer2 = new Customer("Kevin", "Adams", "someNumber", "someAddress");
         customer3 = new Customer("John", "Doe", "someNumber", "someAddress");
@@ -31,42 +40,39 @@ class CustomerServiceTest {
 
     @Test
     public void getAllCustomers_returnsListOfCustomers() {
-        service.customers = customers;
+        when(repository.findAll()).thenReturn(customers);
         List<Customer> result = service.getAllCustomers();
         assertEquals(customers, result);
+        verify(repository, times(1)).findAll();
     }
 
     @Test
     public void addCustomer_addsCustomerToList() {
         Customer newCustomer = new Customer("Suzy", "Reynolds", "noNumber", "tacoDiner");
+        when(repository.save(newCustomer)).thenReturn(null);
         service.addCustomer(newCustomer);
-        assertEquals(newCustomer, service.customers.get(0));
+        verify(repository, times(1)).save(newCustomer);
     }
 
     @Test
     public void getCustomerById_returnsCustomerFromList() {
-        service.customers = customers;
-        String customerId = customers.get(1).getId();
-        Customer result = service.getCustomerById(customerId);
-        assertEquals(customers.get(1), result);
+        when(repository.findById("mockId")).thenReturn(java.util.Optional.ofNullable(customer2));
+        Customer result = service.getCustomerById("mockId");
+        verify(repository, times(1)).findById("mockId");
     }
 
     @Test
     public void updateCustomer_returnsUpdatedCustomerFromList() {
-        service.customers = customers;
-        String customerId = customers.get(1).getId();
         Customer updatedCustomer = new Customer("Kevin", "Adams", "someNumber", "newAddress");
-        updatedCustomer.setId(customerId);
+        when(repository.save(updatedCustomer)).thenReturn(updatedCustomer);
         Customer result = service.updateCustomer(updatedCustomer);
         assertEquals(updatedCustomer, result);
-        assertEquals(updatedCustomer, service.customers.get(2));
+        verify(repository, times(1)).save(updatedCustomer);
     }
 
     @Test
     public void removeCustomer_removesCustomerFromList() {
-        service.customers = customers;
-        String customerId = customers.get(1).getId();
-        service.removeCustomer(customerId);
-        assertEquals(2, service.customers.size());
+        service.removeCustomer("mockId");
+        verify(repository, times(1)).deleteById("mockId");
     }
 }
