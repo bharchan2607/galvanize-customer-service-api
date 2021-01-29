@@ -33,4 +33,46 @@ public class CustomerService {
     public void removeCustomer(String customerId) {
         repository.deleteById(customerId);
     }
+
+    public CustomerResponse getAllCustomersResponse() {
+        return CustomerResponse.builder()
+                .statusCode(200)
+                .status("OK")
+                .data(getAllCustomers())
+                .build();
+    }
+
+    public CustomerResponse getCustomerByIdResponse(String customerId) {
+        return CustomerResponse.builder()
+                .statusCode(200)
+                .status("OK")
+                .data(getCustomerById(customerId))
+                .build();
+    }
+
+    public CustomerResponse updateCustomerResponse(Customer updatedCustomer) {
+        return CustomerResponse.builder()
+                .statusCode(200)
+                .status("OK")
+                .data(updateCustomer(updatedCustomer))
+                .build();
+    }
+
+    public CustomerResponse addCustomerResponse(Customer newCustomer) {
+        addCustomer(newCustomer);
+        return CustomerResponse.builder()
+                .statusCode(201)
+                .status("Created")
+                .data(null)
+                .build();
+    }
+
+    public CustomerResponse removeCustomerResponse(String customerId) {
+        removeCustomer(customerId);
+        return CustomerResponse.builder()
+                .statusCode(204)
+                .status("No Content")
+                .data(null)
+                .build();
+    }
 }

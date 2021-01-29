@@ -47,6 +47,15 @@ class CustomerServiceTest {
     }
 
     @Test
+    public void getAllCustomersResponse_returnsCustomResponseObject() {
+        CustomerResponse customerResponse = new CustomerResponse(200, "OK", customers);
+        when(repository.findAll()).thenReturn(customers);
+        CustomerResponse result = service.getAllCustomersResponse();
+        assertEquals(customerResponse, result);
+        verify(repository, times(1)).findAll();
+    }
+
+    @Test
     public void addCustomer_addsCustomerToList() {
         Customer newCustomer = new Customer("Suzy", "Reynolds", "noNumber", "tacoDiner");
         when(repository.save(newCustomer)).thenReturn(null);
@@ -74,5 +83,42 @@ class CustomerServiceTest {
     public void removeCustomer_removesCustomerFromList() {
         service.removeCustomer("mockId");
         verify(repository, times(1)).deleteById("mockId");
+    }
+
+    @Test
+    public void getCustomerByIdResponse_returnsCustomResponseObject() {
+        CustomerResponse expected = new CustomerResponse(200, "OK", customer2);
+        when(repository.findById("mockId")).thenReturn(java.util.Optional.ofNullable(customer2));
+        CustomerResponse result = service.getCustomerByIdResponse("mockId");
+        verify(repository, times(1)).findById("mockId");
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void updateCustomerResponse_returnsCustomResponseObject() {
+        Customer updatedCustomer = new Customer("Kevin", "Adams", "someNumber", "newAddress");
+        CustomerResponse expected = new CustomerResponse(200, "OK", updatedCustomer);
+        when(repository.save(updatedCustomer)).thenReturn(updatedCustomer);
+        CustomerResponse result = service.updateCustomerResponse(updatedCustomer);
+        assertEquals(expected, result);
+        verify(repository, times(1)).save(updatedCustomer);
+    }
+
+    @Test
+    public void addCustomerResponse_returnsCustomResponseObject() {
+        CustomerResponse expected = new CustomerResponse(201, "Created", null);
+        Customer newCustomer = new Customer("Suzy", "Reynolds", "noNumber", "tacoDiner");
+        when(repository.save(newCustomer)).thenReturn(null);
+        CustomerResponse result = service.addCustomerResponse(newCustomer);
+        verify(repository, times(1)).save(newCustomer);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void removeCustomerResponse_returnsCustomResponseObject() {
+        CustomerResponse expected = new CustomerResponse(204, "No Content", null);
+        CustomerResponse result = service.removeCustomerResponse("mockId");
+        verify(repository, times(1)).deleteById("mockId");
+        assertEquals(expected, result);
     }
 }
